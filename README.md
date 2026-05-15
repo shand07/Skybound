@@ -1,6 +1,7 @@
 
+<div align="center">
 
-**Skybound**
+  **Skybound**
 
 Based on a novel series by Sean Hand, Skybound follows Arkael and the companions he meets on a grand journey spanning deep dark dungeons, mystical forests, ancient ruins, war-torn kingdoms, and even dead planets lost beyond the stars.
 
@@ -99,3 +100,4 @@ More information, screenshots, music, lore, and development updates will be shar
 <p align="center">
   <img src="Assets/Art/Cutscene%20Art/Arkael_Elysia_Dave_Journey_Start.png" width="900"/>
 </p>
+</div>

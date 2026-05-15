@@ -34,7 +34,6 @@ Final Fantasy VII,
 Final Fantasy X,
 Dragon Age: Origins,
 Classic party-based CRPGs and tactical RPGs
-Current Development Progress
 
 **Implemented Systems**
 

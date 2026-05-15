@@ -19,6 +19,10 @@ Shape Arkael’s journey through friendship, romance, and difficult choices
 
 At its core, Skybound is about adventure, loss, hope, and the bonds formed between people struggling against forces far greater than themselves.
 
+<p align="center">
+  <img src="Assets/Art/Cutscene%20Art/Arkael_Elysia_Dave_Journey_Start.png" width="800"/>
+</p>
+
 **Inspirations**
 
 Skybound draws inspiration from:

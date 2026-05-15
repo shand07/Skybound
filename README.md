@@ -11,9 +11,7 @@ Inspired heavily by classic RPGs such as the Baldur's Gate I/II, Pathfinder: Kin
 
 Skybound is a story-driven RPG currently in development using the Unity engine.
 
-Players will:
-
-Explore a massive fantasy/sci-fi world
+Players will, explore a massive fantasy/sci-fi world
 Build relationships with companions
 Battle dangerous enemies in tactical combat
 Discover ancient mysteries hidden beneath the world
@@ -90,9 +88,7 @@ Skybound is currently in active early development.
 
 Systems, mechanics, visuals, story content, and architecture are all subject to change as development continues.
 
-Follow Development:
-
-More information, screenshots, music, lore, and development updates will be shared over time as the project evolves.
+Follow Development, more information, screenshots, music, lore, and development updates will be shared over time as the project evolves.
 
 **Thank you for checking out Skybound**
 

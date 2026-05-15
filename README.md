@@ -54,25 +54,25 @@ Faction and control architecture
 
 **Currently In Development**
 
-AI systems
-Data architecture
-ScriptableObject integration
-Gameplay framework expansion
+- AI systems
+- Data architecture
+- ScriptableObject integration
+- Gameplay framework expansion
 
 
 **Planned Systems**
 
-Dialogue system
-Party manager
-Cutscene manager
-Game UI
-Save/load system
-Inventory and equipment systems
-Talent and progression systems
-Quest systems
-Companion relationship systems
-World map and travel systems
-Themes
+- Dialogue system
+- Party manager
+- Cutscene manager
+- Game UI
+- Save/load system
+- Inventory and equipment systems
+- Talent and progression systems
+- Quest systems
+- Companion relationship systems
+- World map and travel systems
+- Themes
 
 Skybound explores themes such as:
 

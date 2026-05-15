@@ -37,31 +37,37 @@ Classic party-based CRPGs and tactical RPGs
 
 **Implemented Systems**
 
-Basic combat framework
-Character differentiation systems
-Character movement and navigation
-Tactical camera controls
-Unit and party selection
-Box selection
-Formation movement
-Fog of war system
-Exploration visibility states
-Faction and control architecture
+
+</div>
+
+- Basic combat framework
+- Character differentiation systems
+- Character movement and navigation
+- Tactical camera controls
+- Unit and party selection
+- Box selection
+- Formation movement
+- Fog of war system
+- Exploration visibility states
+- Faction and control architecture
 
 <p align="center">
   <img src="Assets/Art/Cutscene%20Art/Battle_On_The_Bridge.png" width="900"/>
 </p>
+<div align="center">
 
-**Currently In Development**
+ **Currently In Development**
+</div>
 
 - AI systems
 - Data architecture
 - ScriptableObject integration
 - Gameplay framework expansion
 
-
+<div align="center">
+ 
 **Planned Systems**
-
+</div>
 - Dialogue system
 - Party manager
 - Cutscene manager
@@ -73,7 +79,8 @@ Faction and control architecture
 - Companion relationship systems
 - World map and travel systems
 - Themes
-
+<div align="center">
+ 
 Skybound explores themes such as:
 
 Identity and belonging

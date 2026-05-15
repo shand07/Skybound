@@ -25,8 +25,6 @@ At its core, Skybound is about adventure, loss, hope, and the bonds formed betwe
   <img src="Assets/Art/Cutscene%20Art/Arkael_Yumina_Back_To_Rail.png" width="900"/>
 </p>
 
-<p>
-
 **Inspirations**
 
 Skybound draws inspiration from:

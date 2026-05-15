@@ -50,6 +50,10 @@ Fog of war system
 Exploration visibility states
 Faction and control architecture
 
+<p align="center">
+  <img src="Assets/Art/Cutscene%20Art/Battle_On_The_Bridge.png" width="900"/>
+</p>
+
 **Currently In Development**
 
 AI systems
@@ -90,3 +94,7 @@ Follow Development
 More information, screenshots, music, lore, and development updates will be shared over time as the project evolves.
 
 **Thank you for checking out Skybound.**
+
+<p align="center">
+  <img src="Assets/Art/Cutscene%20Art/Arkael_Elysia_Dave_Journey_Start.png" width="900"/>
+</p>

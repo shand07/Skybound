@@ -68,6 +68,7 @@ Classic party-based CRPGs and tactical RPGs
  
 **Planned Systems**
 </div>
+
 - Dialogue system
 - Party manager
 - Cutscene manager

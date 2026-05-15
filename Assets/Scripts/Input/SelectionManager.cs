@@ -284,17 +284,27 @@ namespace Skybound.InputSystem
             GUI.DrawTexture(new Rect(rect.xMax - thickness, rect.yMin, thickness, rect.height), Texture2D.whiteTexture);
         }
         
-        private void IssueAttackCommand(CharacterStats target)
+        private void IssueAttackCommand(CharacterStats targetStats)
         {
-            foreach (SelectableUnit selectedUnit in selectedUnits)
+            if (GameManager.Instance != null && GameManager.Instance.IsPaused)
+                return;
+
+            foreach (SelectableUnit unit in selectedUnits)
             {
-                if (selectedUnit == null)
+                if (unit == null)
                     continue;
 
-                CombatAttackController attackController = selectedUnit.GetComponent<CombatAttackController>();
+                UnitMoveMarkerController markerController =
+                    unit.GetComponent<UnitMoveMarkerController>();
+
+                if (markerController != null)
+                    markerController.ClearMarker();
+
+                CombatAttackController attackController =
+                    unit.GetComponent<CombatAttackController>();
 
                 if (attackController != null)
-                    attackController.SetAttackTarget(target);
+                    attackController.SetAttackTarget(targetStats);
             }
         }
     }

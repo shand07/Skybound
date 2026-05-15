@@ -1,4 +1,5 @@
 using UnityEngine;
+using Skybound.Data;
 
 namespace Skybound.Characters
 {
@@ -33,6 +34,9 @@ namespace Skybound.Characters
         [SerializeField] private int accuracy;
         [SerializeField] private int armorClass;
         [SerializeField] private int damageReduction;
+        
+        [Header("Data")]
+        [SerializeField] private CharacterData characterData;
 
         public int Strength => strength;
         public int Dexterity => dexterity;
@@ -47,8 +51,9 @@ namespace Skybound.Characters
 
         public bool IsDead => currentHealth <= 0;
 
-        private void Awake()
+      private void Awake()
         {
+            LoadCharacterData();
             RecalculateStats();
             currentHealth = maxHealth;
         }
@@ -102,7 +107,12 @@ namespace Skybound.Characters
             return Random.Range(1, 21);
         }
 
-        public bool RollAttackAgainst(CharacterStats defender, out int roll, out bool isCritical, out bool isNaturalMiss)
+        public bool RollAttackAgainst(
+            CharacterStats defender,
+            int bonusAccuracy,
+            out int roll,
+            out bool isCritical,
+            out bool isNaturalMiss)
         {
             roll = RollD20();
 
@@ -115,7 +125,7 @@ namespace Skybound.Characters
             if (isCritical)
                 return true;
 
-            int attackTotal = roll + accuracy;
+            int attackTotal = roll + accuracy + bonusAccuracy;
             return attackTotal >= defender.ArmorClass;
         }
 
@@ -153,6 +163,24 @@ namespace Skybound.Characters
         {
             Debug.Log($"{name} died.");
             gameObject.SetActive(false);
+        }
+        
+        private void LoadCharacterData()
+        {
+            if (characterData == null)
+                return;
+
+            strength = characterData.Strength;
+            dexterity = characterData.Dexterity;
+            constitution = characterData.Constitution;
+            intelligence = characterData.Intelligence;
+
+            baseHealth = characterData.BaseHealth;
+            healthPerConstitution = characterData.HealthPerConstitution;
+
+            baseAccuracy = characterData.BaseAccuracy;
+            baseArmorClass = characterData.BaseArmorClass;
+            baseDamageReduction = characterData.BaseDamageReduction;
         }
     }
 }

@@ -139,6 +139,8 @@ GameObject:
   - component: {fileID: 47119915}
   - component: {fileID: 47119925}
   - component: {fileID: 47119926}
+  - component: {fileID: 47119927}
+  - component: {fileID: 47119928}
   m_Layer: 6
   m_Name: Bandit_Test
   m_TagString: Untagged
@@ -172,6 +174,7 @@ MonoBehaviour:
   accuracy: 0
   armorClass: 0
   damageReduction: 0
+  characterData: {fileID: 11400000, guid: b5c2c5e78db21644c84ee23aa811ffea, type: 2}
 --- !u!114 &47119916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,7 +193,9 @@ MonoBehaviour:
   roundTimer: 0
   availableActions: 0
   attacksRemainingThisRound: 0
-  nextAttackTime: 0
+  mainHandAttacksRemainingThisRound: 0
+  offHandAttacksRemainingThisRound: 0
+  nextMainHandAttackTime: 0
 --- !u!114 &47119917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +370,8 @@ MonoBehaviour:
   attackRange: 2
   attackCheckInterval: 0.15
   criticalDamageMultiplier: 2
+  offHandFollowUpDelay: 0.25
+  offHandAccuracyPenalty: -4
 --- !u!114 &47119926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,6 +386,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Skybound.Systems.FogOfWar.FogVisibilityTarget
   visibleOnlyInCurrentVision: 1
   renderersToControl: []
+--- !u!114 &47119927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 47119914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a172b1e4c0588c4a9157f7f6fbe9f24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skybound.Combat.EnemyAIController
+--- !u!114 &47119928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 47119914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdc1cfd5613d934bb3dc9db0e7b720d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skybound.Characters.CharacterEquipment
+  mainHand: {fileID: 11400000, guid: 02028b35110919d4ba5f2cf5539d9cf2, type: 2}
+  offHand: {fileID: 0}
 --- !u!1 &52715158
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,6 +432,7 @@ GameObject:
   - component: {fileID: 52715160}
   - component: {fileID: 52715159}
   - component: {fileID: 52715170}
+  - component: {fileID: 52715171}
   m_Layer: 6
   m_Name: Party1
   m_TagString: Untagged
@@ -422,6 +456,8 @@ MonoBehaviour:
   attackRange: 2
   attackCheckInterval: 0.15
   criticalDamageMultiplier: 2
+  offHandFollowUpDelay: 0.25
+  offHandAccuracyPenalty: -4
 --- !u!114 &52715160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,6 +484,7 @@ MonoBehaviour:
   accuracy: 0
   armorClass: 0
   damageReduction: 0
+  characterData: {fileID: 11400000, guid: fb005698493984945905941dc208fe97, type: 2}
 --- !u!114 &52715161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -466,7 +503,9 @@ MonoBehaviour:
   roundTimer: 0
   availableActions: 0
   attacksRemainingThisRound: 0
-  nextAttackTime: 0
+  mainHandAttacksRemainingThisRound: 0
+  offHandAttacksRemainingThisRound: 0
+  nextMainHandAttackTime: 0
 --- !u!114 &52715162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -638,6 +677,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skybound.Systems.FogOfWar.VisionSource
   visionRange: 8
+--- !u!114 &52715171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 52715158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdc1cfd5613d934bb3dc9db0e7b720d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skybound.Characters.CharacterEquipment
+  mainHand: {fileID: 0}
+  offHand: {fileID: 0}
 --- !u!1 &260566725
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,6 +711,7 @@ GameObject:
   - component: {fileID: 260566735}
   - component: {fileID: 260566736}
   - component: {fileID: 260566737}
+  - component: {fileID: 260566738}
   m_Layer: 6
   m_Name: CharacterRoot
   m_TagString: Untagged
@@ -841,7 +895,9 @@ MonoBehaviour:
   roundTimer: 0
   availableActions: 0
   attacksRemainingThisRound: 0
-  nextAttackTime: 0
+  mainHandAttacksRemainingThisRound: 0
+  offHandAttacksRemainingThisRound: 0
+  nextMainHandAttackTime: 0
 --- !u!114 &260566735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -868,6 +924,7 @@ MonoBehaviour:
   accuracy: 0
   armorClass: 0
   damageReduction: 0
+  characterData: {fileID: 11400000, guid: 52622983a7fbdee498ce6df0a17728e5, type: 2}
 --- !u!114 &260566736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,6 +941,8 @@ MonoBehaviour:
   attackRange: 2
   attackCheckInterval: 0.15
   criticalDamageMultiplier: 2
+  offHandFollowUpDelay: 0.25
+  offHandAccuracyPenalty: -4
 --- !u!114 &260566737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -897,6 +956,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skybound.Systems.FogOfWar.VisionSource
   visionRange: 8
+--- !u!114 &260566738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 260566725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdc1cfd5613d934bb3dc9db0e7b720d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skybound.Characters.CharacterEquipment
+  mainHand: {fileID: 11400000, guid: deaea8b855ba8ee4aaf7d14b663f9774, type: 2}
+  offHand: {fileID: 11400000, guid: deaea8b855ba8ee4aaf7d14b663f9774, type: 2}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -1273,6 +1346,51 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -11.82045, y: -0.00001, z: -12.52939}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &640468369
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 640468371}
+  - component: {fileID: 640468370}
+  m_Layer: 0
+  m_Name: EnemyDetectionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &640468370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 640468369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b699742aee33b4d875d102871ed13d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skybound.Combat.EnemyDetectionManager
+  detectionRange: 8
+--- !u!4 &640468371
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 640468369}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.29872, y: 7.3652, z: -2.00767}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2254,6 +2372,7 @@ GameObject:
   - component: {fileID: 1806325583}
   - component: {fileID: 1806325582}
   - component: {fileID: 1806325581}
+  - component: {fileID: 1806325592}
   m_Layer: 6
   m_Name: Party2
   m_TagString: Untagged
@@ -2277,6 +2396,8 @@ MonoBehaviour:
   attackRange: 2
   attackCheckInterval: 0.15
   criticalDamageMultiplier: 2
+  offHandFollowUpDelay: 0.25
+  offHandAccuracyPenalty: -4
 --- !u!114 &1806325582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2303,6 +2424,7 @@ MonoBehaviour:
   accuracy: 0
   armorClass: 0
   damageReduction: 0
+  characterData: {fileID: 11400000, guid: b6cbe52359b60d14f96bfe59a4d421ed, type: 2}
 --- !u!114 &1806325583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2321,7 +2443,9 @@ MonoBehaviour:
   roundTimer: 0
   availableActions: 0
   attacksRemainingThisRound: 0
-  nextAttackTime: 0
+  mainHandAttacksRemainingThisRound: 0
+  offHandAttacksRemainingThisRound: 0
+  nextMainHandAttackTime: 0
 --- !u!114 &1806325584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2480,6 +2604,20 @@ Transform:
   - {fileID: 1506514811}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1806325592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1806325580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdc1cfd5613d934bb3dc9db0e7b720d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skybound.Characters.CharacterEquipment
+  mainHand: {fileID: 0}
+  offHand: {fileID: 0}
 --- !u!1 &1872211860
 GameObject:
   m_ObjectHideFlags: 0
@@ -2787,3 +2925,4 @@ SceneRoots:
   - {fileID: 52715169}
   - {fileID: 1806325591}
   - {fileID: 2031079584}
+  - {fileID: 640468371}

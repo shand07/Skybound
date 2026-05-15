@@ -41,6 +41,8 @@ namespace Skybound.Characters
             if (!CanBeSelectedByPlayer())
                 return;
 
+            agent.stoppingDistance = 0.1f;
+            agent.isStopped = false;
             agent.SetDestination(destination);
         }
     }

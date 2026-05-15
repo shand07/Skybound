@@ -59,12 +59,10 @@ Classic party-based CRPGs and tactical RPGs
  **Currently In Development**
 </div>
 
-<ul align="center">
-  <li>AI systems</li>
-  <li>Data architecture</li>
-  <li>ScriptableObject integration</li>
-  <li>Gameplay framework expansion</li>
-</ul>
+- AI Systems
+- Data Architecture
+- ScriptableObject Integration
+- Gameplay Framework Expansion
 
 <div align="center">
  

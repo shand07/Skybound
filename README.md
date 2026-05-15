@@ -28,11 +28,11 @@ At its core, Skybound is about adventure, loss, hope, and the bonds formed betwe
 
 Skybound draws inspiration from:
 
-Baldur's Gate
-Pathfinder: Wrath of the Righteous
-Final Fantasy VII
-Final Fantasy X
-Dragon Age: Origins
+Baldur's Gate,
+Pathfinder: Wrath of the Righteous,
+Final Fantasy VII,
+Final Fantasy X,
+Dragon Age: Origins,
 Classic party-based CRPGs and tactical RPGs
 Current Development Progress
 

@@ -5,7 +5,7 @@
 
 Based on a novel series by Sean Hand, Skybound follows Arkael and the companions he meets on a grand journey spanning deep dark dungeons, mystical forests, ancient ruins, war-torn kingdoms, and even dead planets lost beyond the stars.
 
-Inspired heavily by classic RPGs such as the Baldur's Gate II: Shadows of Amn series, Pathfinder: Wrath of the Righteous, and legendary JRPGs like Final Fantasy X, Skybound aims to blend tactical party-based gameplay, rich worldbuilding, emotional storytelling, and character-driven adventure into a single experience.
+Inspired heavily by classic RPGs such as the Baldur's Gate I/II, Pathfinder: Kingmaker/WoTR, and legendary JRPGs like Final Fantasy X, Skybound aims to blend tactical party-based gameplay, rich worldbuilding, emotional storytelling, and character-driven adventure into a single experience.
 
 **About The Game**
 
@@ -40,16 +40,16 @@ Current Development Progress
 
 **Implemented Systems**
 
-- Basic combat framework
-- Character differentiation systems
-- Character movement and navigation
-- Tactical camera controls
-- Unit and party selection
-- Box selection
-- Formation movement
-- Fog of war system
-- Exploration visibility states
-- Faction and control architecture
+Basic combat framework
+Character differentiation systems
+Character movement and navigation
+Tactical camera controls
+Unit and party selection
+Box selection
+Formation movement
+Fog of war system
+Exploration visibility states
+Faction and control architecture
 
 <p align="center">
   <img src="Assets/Art/Cutscene%20Art/Battle_On_The_Bridge.png" width="900"/>

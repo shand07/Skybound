@@ -18,7 +18,7 @@ Build relationships with companions
 Battle dangerous enemies in tactical combat
 Discover ancient mysteries hidden beneath the world
 Travel across kingdoms, ruins, dungeons, and forgotten civilizations
-Shape Arkael’s journey through friendship, romance, and difficult choices
+Shape Arkael’s journey through friendship, romance, and difficult choices.
 
 At its core, Skybound is about adventure, loss, hope, and the bonds formed between people struggling against forces far greater than themselves.
 
@@ -90,7 +90,7 @@ Skybound is currently in active early development.
 
 Systems, mechanics, visuals, story content, and architecture are all subject to change as development continues.
 
-Follow Development
+Follow Development:
 
 More information, screenshots, music, lore, and development updates will be shared over time as the project evolves.
 

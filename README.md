@@ -94,7 +94,7 @@ Follow Development
 
 More information, screenshots, music, lore, and development updates will be shared over time as the project evolves.
 
-**Thank you for checking out Skybound.**
+**Thank you for checking out Skybound**
 
 
 <p align="center">

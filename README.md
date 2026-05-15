@@ -19,6 +19,8 @@ Shape Arkael’s journey through friendship, romance, and difficult choices
 
 At its core, Skybound is about adventure, loss, hope, and the bonds formed between people struggling against forces far greater than themselves.
 
+![Arkael_Yumina_Back_To_Rail](Assets/Art/Cutscene Art/Arkael_Yumina_Back_To_Rail.png)
+
 **Inspirations**
 
 Skybound draws inspiration from:

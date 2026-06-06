@@ -1,4 +1,6 @@
 using Skybound.Combat;
+using Skybound.Core.Diagnostics;
+using Skybound.Core.Services;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,48 +14,82 @@ namespace Skybound.Characters
         [SerializeField] private float combatSpeed = 3.5f;
 
         private NavMeshAgent agent;
+        private CombatStateManager combatStateManager;
         private bool isSubscribed;
 
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+
+            if (agent == null)
+                SkyboundDebug.MissingReference(this, nameof(NavMeshAgent));
         }
 
         private void Start()
         {
-            TrySubscribeToCombatState();
+            ResolveDependencies();
+            SubscribeToCombatState();
             ApplyCurrentSpeed();
         }
 
         private void OnDisable()
         {
-            if (CombatStateManager.Instance != null && isSubscribed)
+            UnsubscribeFromCombatState();
+        }
+
+        private void ResolveDependencies()
+        {
+            if (!SkyboundServiceRegistry.TryGet(out combatStateManager))
             {
-                CombatStateManager.Instance.OnCombatStateChanged -= HandleCombatStateChanged;
-                isSubscribed = false;
+                SkyboundDebug.ServiceUnavailable(
+                    this,
+                    nameof(CombatStateManager),
+                    "Make sure CombatStateManager exists in the scene and registers itself in Awake."
+                );
             }
         }
 
-        private void TrySubscribeToCombatState()
+        private void SubscribeToCombatState()
         {
-            if (CombatStateManager.Instance == null || isSubscribed)
+            if (combatStateManager == null)
                 return;
 
-            CombatStateManager.Instance.OnCombatStateChanged += HandleCombatStateChanged;
+            if (isSubscribed)
+                return;
+
+            combatStateManager.OnCombatStateChanged += HandleCombatStateChanged;
             isSubscribed = true;
+
+            SkyboundDebug.Log($"{name} subscribed to combat state changes.", this);
+        }
+
+        private void UnsubscribeFromCombatState()
+        {
+            if (combatStateManager == null || !isSubscribed)
+                return;
+
+            combatStateManager.OnCombatStateChanged -= HandleCombatStateChanged;
+            isSubscribed = false;
+
+            SkyboundDebug.Log($"{name} unsubscribed from combat state changes.", this);
         }
 
         private void ApplyCurrentSpeed()
         {
-            bool isInCombat = CombatStateManager.Instance != null && CombatStateManager.Instance.IsInCombat;
-            HandleCombatStateChanged(isInCombat);
+            if (combatStateManager == null)
+                return;
+
+            HandleCombatStateChanged(combatStateManager.IsInCombat);
         }
 
         private void HandleCombatStateChanged(bool isInCombat)
         {
+            if (agent == null)
+                return;
+
             agent.speed = isInCombat ? combatSpeed : explorationSpeed;
 
-            Debug.Log($"{name} speed changed to {agent.speed}");
+            SkyboundDebug.Log($"{name} speed changed to {agent.speed}.", this);
         }
     }
 }

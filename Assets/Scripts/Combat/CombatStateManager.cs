@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Skybound.Core.Diagnostics;
+using Skybound.Core.Services;
 using UnityEngine;
 
 namespace Skybound.Combat
@@ -23,17 +25,38 @@ namespace Skybound.Combat
         {
             if (Instance != null && Instance != this)
             {
+                SkyboundDebug.Warning("Duplicate CombatStateManager found. Destroying duplicate.", this);
                 Destroy(gameObject);
                 return;
             }
 
             Instance = this;
+            SkyboundServiceRegistry.Register(this);
+
             IsInCombat = false;
+            exitCombatTimer = 0f;
+
+            SkyboundDebug.Log("CombatStateManager initialized.", this);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+                SkyboundServiceRegistry.Unregister<CombatStateManager>();
+            }
         }
 
         private void Update()
         {
             RemoveDeadOrInactiveEnemies();
+
+            if (Input.GetKeyDown(KeyCode.C))
+                EnterCombat();
+
+            if (Input.GetKeyDown(KeyCode.V))
+                ForceExitCombat();
 
             if (!IsInCombat)
                 return;
@@ -47,16 +70,7 @@ namespace Skybound.Combat
             exitCombatTimer += Time.deltaTime;
 
             if (exitCombatTimer >= exitCombatGracePeriod)
-            {
                 ExitCombat();
-            }
-
-            // temporary test keys
-            if (Input.GetKeyDown(KeyCode.C))
-                EnterCombat();
-
-            if (Input.GetKeyDown(KeyCode.V))
-                ForceExitCombat();
         }
 
         public void EnterCombat()
@@ -69,24 +83,42 @@ namespace Skybound.Combat
 
             OnCombatStateChanged?.Invoke(IsInCombat);
 
-            Debug.Log("Entered Combat");
+            SkyboundDebug.Log("Entered combat.", this);
         }
 
         public void RegisterEnemy(GameObject enemy)
         {
             if (enemy == null)
+            {
+                SkyboundDebug.Warning("Tried to register a null enemy.", this);
                 return;
+            }
 
-            activeEnemies.Add(enemy);
+            bool added = activeEnemies.Add(enemy);
+
+            if (added)
+                SkyboundDebug.Log($"Registered enemy: {enemy.name}. Active enemies: {activeEnemies.Count}", enemy);
+
             EnterCombat();
         }
 
         public void UnregisterEnemy(GameObject enemy)
         {
             if (enemy == null)
+            {
+                SkyboundDebug.Warning("Tried to unregister a null enemy.", this);
                 return;
+            }
 
-            activeEnemies.Remove(enemy);
+            bool removed = activeEnemies.Remove(enemy);
+
+            if (removed)
+                SkyboundDebug.Log($"Unregistered enemy: {enemy.name}. Active enemies: {activeEnemies.Count}", enemy);
+        }
+
+        public void ForceExitCombat()
+        {
+            ExitCombat();
         }
 
         private void ExitCombat()
@@ -100,17 +132,15 @@ namespace Skybound.Combat
 
             OnCombatStateChanged?.Invoke(IsInCombat);
 
-            Debug.Log("Exited Combat");
-        }
-
-        public void ForceExitCombat()
-        {
-            ExitCombat();
+            SkyboundDebug.Log("Exited combat.", this);
         }
 
         private void RemoveDeadOrInactiveEnemies()
         {
-            activeEnemies.RemoveWhere(enemy => enemy == null || !enemy.activeInHierarchy);
+            int removedCount = activeEnemies.RemoveWhere(enemy => enemy == null || !enemy.activeInHierarchy);
+
+            if (removedCount > 0)
+                SkyboundDebug.Log($"Removed {removedCount} dead/inactive enemies from combat tracking.", this);
         }
     }
 }

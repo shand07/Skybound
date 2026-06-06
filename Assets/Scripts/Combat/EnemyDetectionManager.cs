@@ -1,4 +1,6 @@
 using Skybound.Characters;
+using Skybound.Core.Diagnostics;
+using Skybound.Core.Services;
 using Skybound.Systems.FogOfWar;
 using UnityEngine;
 
@@ -9,9 +11,51 @@ namespace Skybound.Combat
         [Header("Detection")]
         [SerializeField] private float detectionRange = 10f;
 
+        [Header("Fog Rules")]
+        [SerializeField] private bool requireFogVisibility = true;
+
+        private FogOfWarManager fogOfWarManager;
+
+        private void Start()
+        {
+            ResolveDependencies();
+            ValidateSettings();
+        }
+
         private void Update()
         {
             CheckEnemyAggro();
+        }
+
+        private void ResolveDependencies()
+        {
+            if (!SkyboundServiceRegistry.TryGet(out fogOfWarManager))
+            {
+                if (requireFogVisibility)
+                {
+                    SkyboundDebug.ServiceUnavailable(
+                        this,
+                        nameof(FogOfWarManager),
+                        "Enemy detection requires fog visibility, so enemies will not aggro from fog."
+                    );
+                }
+                else
+                {
+                    SkyboundDebug.Warning(
+                        "FogOfWarManager not found. Enemy detection will ignore fog visibility.",
+                        this
+                    );
+                }
+            }
+        }
+
+        private void ValidateSettings()
+        {
+            if (detectionRange <= 0f)
+            {
+                SkyboundDebug.Warning($"{name} had invalid detectionRange. Resetting to 10.", this);
+                detectionRange = 10f;
+            }
         }
 
         private void CheckEnemyAggro()
@@ -38,9 +82,7 @@ namespace Skybound.Combat
                 float distance = Vector3.Distance(enemy.transform.position, nearestPlayer.transform.position);
 
                 if (distance <= detectionRange)
-                {
                     enemy.Aggro(nearestPlayer);
-                }
             }
         }
 
@@ -73,10 +115,10 @@ namespace Skybound.Combat
 
         private bool IsEnemyVisibleToPlayer(Vector3 enemyPosition)
         {
-            if (FogOfWarManager.Instance == null)
-                return true;
+            if (fogOfWarManager == null)
+                return !requireFogVisibility;
 
-            return FogOfWarManager.Instance.GetFogStateAtWorldPosition(enemyPosition) == FogState.Visible;
+            return fogOfWarManager.GetFogStateAtWorldPosition(enemyPosition) == FogState.Visible;
         }
     }
 }

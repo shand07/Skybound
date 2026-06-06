@@ -1,5 +1,6 @@
 using UnityEngine;
 using Skybound.Data;
+using Skybound.Core.Diagnostics;
 
 namespace Skybound.Characters
 {
@@ -168,7 +169,25 @@ namespace Skybound.Characters
         private void LoadCharacterData()
         {
             if (characterData == null)
+            {
+                SkyboundDebug.MissingReference(
+                    this,
+                    nameof(characterData),
+                    "Assign a CharacterData asset."
+                );
+
                 return;
+            }
+
+            if (!characterData.IsValid(out string errorMessage))
+            {
+                SkyboundDebug.Error(
+                    $"{name} has invalid CharacterData '{characterData.name}': {errorMessage}",
+                    this
+                );
+
+                return;
+            }
 
             strength = characterData.Strength;
             dexterity = characterData.Dexterity;
@@ -181,6 +200,8 @@ namespace Skybound.Characters
             baseAccuracy = characterData.BaseAccuracy;
             baseArmorClass = characterData.BaseArmorClass;
             baseDamageReduction = characterData.BaseDamageReduction;
+
+            SkyboundDebug.Log($"{name} loaded CharacterData: {characterData.CharacterName}", this);
         }
     }
 }

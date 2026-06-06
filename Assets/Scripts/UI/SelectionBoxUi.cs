@@ -2,21 +2,25 @@ using UnityEngine;
 
 namespace Skybound.UI
 {
+    [RequireComponent(typeof(RectTransform))]
     public class SelectionBoxUI : MonoBehaviour
     {
-        [SerializeField] private RectTransform selectionBox;
+        private RectTransform selectionBox;
 
         private Vector2 startPosition;
 
         private void Awake()
         {
-            selectionBox.gameObject.SetActive(false);
+            selectionBox = GetComponent<RectTransform>();
+            gameObject.SetActive(false);
         }
 
         public void BeginSelection(Vector2 screenPosition)
         {
             startPosition = screenPosition;
-            selectionBox.gameObject.SetActive(true);
+
+            gameObject.SetActive(true);
+
             UpdateSelection(screenPosition);
         }
 
@@ -25,13 +29,15 @@ namespace Skybound.UI
             Vector2 lowerLeft = Vector2.Min(startPosition, currentPosition);
             Vector2 upperRight = Vector2.Max(startPosition, currentPosition);
 
-            selectionBox.position = lowerLeft;
-            selectionBox.sizeDelta = upperRight - lowerLeft;
+            Vector2 size = upperRight - lowerLeft;
+
+            selectionBox.position = lowerLeft + size * 0.5f;
+            selectionBox.sizeDelta = size;
         }
 
         public void EndSelection()
         {
-            selectionBox.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
     }
 }

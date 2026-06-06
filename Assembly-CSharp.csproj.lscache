@@ -56,7 +56,6 @@ Assets/Scripts/
   CharacterEquipment.cs
   CharacterMovementSpeed.cs
   CharacterStats.cs
-  ClickToMove.cs
   SelectableUnit.cs
   SelectionCircleController.cs
   SelectionRingRenderer.cs

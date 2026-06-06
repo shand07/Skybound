@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe72cb16c5c8d94fb8e45fd32ffe7b5, type: 3}
   m_Name: BanditData
   m_EditorClassIdentifier: Assembly-CSharp::Skybound.Data.CharacterData
-  characterName: 
+  characterName: Bandit
   strength: 11
   dexterity: 10
   constitution: 10

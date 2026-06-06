@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using Skybound.Characters;
-using Skybound.Core;
-using UnityEngine;
-using Skybound.Combat;
+using Skybound.Core.Diagnostics;
 using Skybound.UI;
+using UnityEngine;
 
 namespace Skybound.InputSystem
 {
@@ -16,16 +15,15 @@ namespace Skybound.InputSystem
         [Header("References")]
         [SerializeField] private Camera mainCamera;
 
+        [Header("Systems")]
+        [SerializeField] private MoveCommandSystem moveCommandSystem;
+        [SerializeField] private AttackCommandSystem attackCommandSystem;
+
+        [Header("UI")]
+        [SerializeField] private SelectionBoxUI selectionBoxUI;
+
         [Header("Drag Select")]
         [SerializeField] private float dragThreshold = 10f;
-
-        [Header("Formation")]
-        [SerializeField] private float formationSpacing = 1.5f;
-        [SerializeField] private int formationColumns = 3;
-        
-        [Header("Move Markers")]
-        [SerializeField] private MoveMarker moveMarkerPrefab;
-        [SerializeField] private float markerGroundOffset = 0.05f;
 
         private readonly List<SelectableUnit> selectedUnits = new();
 
@@ -34,35 +32,110 @@ namespace Skybound.InputSystem
 
         private void Awake()
         {
-            if (mainCamera == null)
-                mainCamera = Camera.main;
+            ResolveReferences();
+            ValidateSettings();
         }
 
         private void Update()
         {
-            HandleLeftClickInput();
+            HandleInput();
         }
 
-        private void HandleLeftClickInput()
+        private void ResolveReferences()
         {
-            
+            if (mainCamera == null)
+                mainCamera = Camera.main;
+
+            if (mainCamera == null)
+            {
+                SkyboundDebug.MissingReference(
+                    this,
+                    nameof(mainCamera),
+                    "Assign a camera in the inspector or tag the main camera as MainCamera."
+                );
+            }
+
+            if (moveCommandSystem == null)
+                moveCommandSystem = GetComponent<MoveCommandSystem>();
+
+            if (moveCommandSystem == null)
+            {
+                SkyboundDebug.MissingReference(
+                    this,
+                    nameof(moveCommandSystem),
+                    "Add MoveCommandSystem to the same GameObject as SelectionManager, or assign it manually."
+                );
+            }
+
+            if (attackCommandSystem == null)
+                attackCommandSystem = GetComponent<AttackCommandSystem>();
+
+            if (attackCommandSystem == null)
+            {
+                SkyboundDebug.MissingReference(
+                    this,
+                    nameof(attackCommandSystem),
+                    "Add AttackCommandSystem to the same GameObject as SelectionManager, or assign it manually."
+                );
+            }
+        }
+
+        private void ValidateSettings()
+        {
+            if (selectableLayer == 0)
+                SkyboundDebug.Warning("SelectionManager selectableLayer is empty. Unit selection may not work.", this);
+
+            if (groundLayer == 0)
+                SkyboundDebug.Warning("SelectionManager groundLayer is empty. Movement commands may not work.", this);
+
+            if (selectionBoxUI == null)
+            {
+                SkyboundDebug.Warning(
+                    "SelectionManager has no SelectionBoxUI assigned. Drag selection still works, but the box will not display.",
+                    this
+                );
+            }
+
+            if (dragThreshold < 0f)
+            {
+                SkyboundDebug.Warning("SelectionManager dragThreshold was negative. Resetting to 10.", this);
+                dragThreshold = 10f;
+            }
+        }
+
+        private void HandleInput()
+        {
+            if (mainCamera == null)
+                return;
+
             if (Input.GetMouseButtonDown(1))
             {
                 ClearSelection();
                 return;
             }
-            
-            
+
             if (Input.GetMouseButtonDown(0))
             {
                 dragStartPosition = Input.mousePosition;
                 isDragging = true;
+
+                if (selectionBoxUI != null)
+                    selectionBoxUI.BeginSelection(dragStartPosition);
+            }
+
+            if (Input.GetMouseButton(0) && isDragging)
+            {
+                if (selectionBoxUI != null)
+                    selectionBoxUI.UpdateSelection(Input.mousePosition);
             }
 
             if (Input.GetMouseButtonUp(0))
             {
                 Vector2 dragEndPosition = Input.mousePosition;
                 isDragging = false;
+
+                if (selectionBoxUI != null)
+                    selectionBoxUI.EndSelection();
 
                 float dragDistance = Vector2.Distance(dragStartPosition, dragEndPosition);
 
@@ -86,7 +159,6 @@ namespace Skybound.InputSystem
                 UnitIdentity identity = unitHit.collider.GetComponentInParent<UnitIdentity>();
                 CharacterStats targetStats = unitHit.collider.GetComponentInParent<CharacterStats>();
 
-                // Select friendly controllable party units
                 if (unit != null && unit.CanBeSelectedByPlayer())
                 {
                     ClearSelection();
@@ -94,7 +166,6 @@ namespace Skybound.InputSystem
                     return;
                 }
 
-                // Attack hostile targets
                 if (identity != null &&
                     identity.IsHostileToPlayer() &&
                     targetStats != null &&
@@ -105,14 +176,41 @@ namespace Skybound.InputSystem
                 }
             }
 
-            // Move command on ground click
             if (Physics.Raycast(ray, out RaycastHit groundHit, 500f, groundLayer))
             {
                 if (selectedUnits.Count > 0)
-                {
-                    MoveSelectedUnits(groundHit.point);
-                }
+                    IssueMoveCommand(groundHit.point);
             }
+        }
+
+        private void IssueMoveCommand(Vector3 destination)
+        {
+            if (moveCommandSystem == null)
+            {
+                SkyboundDebug.Warning(
+                    "Cannot issue move command because MoveCommandSystem is missing.",
+                    this
+                );
+
+                return;
+            }
+
+            moveCommandSystem.MoveUnits(selectedUnits, destination);
+        }
+
+        private void IssueAttackCommand(CharacterStats target)
+        {
+            if (attackCommandSystem == null)
+            {
+                SkyboundDebug.Warning(
+                    "Cannot issue attack command because AttackCommandSystem is missing.",
+                    this
+                );
+
+                return;
+            }
+
+            attackCommandSystem.AttackTarget(selectedUnits, target);
         }
 
         private void BoxSelect(Vector2 start, Vector2 end)
@@ -130,99 +228,42 @@ namespace Skybound.InputSystem
                 Vector3 screenPos = mainCamera.WorldToScreenPoint(unit.transform.position);
 
                 if (screenPos.z > 0f && selectionRect.Contains(screenPos))
-                {
                     unitsInBox.Add(unit);
-                }
             }
 
             if (unitsInBox.Count == 0)
+            {
+                SkyboundDebug.Log("Box select found no selectable units.", this);
                 return;
+            }
 
             ClearSelection();
 
             foreach (SelectableUnit unit in unitsInBox)
-            {
                 SelectUnit(unit);
-            }
-        }
 
-        private void MoveSelectedUnits(Vector3 destination)
-        {
-            if (GameManager.Instance != null && GameManager.Instance.IsPaused)
-                return;
-
-            for (int i = 0; i < selectedUnits.Count; i++)
-            {
-                Vector3 offset = GetFormationOffset(i);
-
-                Vector3 finalDestination = destination + offset;
-                finalDestination.y += markerGroundOffset;
-
-                CombatAttackController attackController =
-                    selectedUnits[i].GetComponent<CombatAttackController>();
-
-                if (attackController != null)
-                    attackController.ClearTarget();
-
-                selectedUnits[i].MoveTo(destination + offset);
-
-                SpawnMoveMarker(selectedUnits[i], finalDestination);
-            }
-        }
-        
-        private void SpawnMoveMarker(SelectableUnit unit, Vector3 destination)
-        {
-            if (moveMarkerPrefab == null || unit == null)
-                return;
-
-            UnitMoveMarkerController markerController =
-                unit.GetComponent<UnitMoveMarkerController>();
-
-            if (markerController == null)
-                markerController = unit.gameObject.AddComponent<UnitMoveMarkerController>();
-
-            MoveMarker marker = Instantiate(
-                moveMarkerPrefab,
-                destination,
-                Quaternion.identity
-            );
-
-            marker.Initialize(unit.transform, destination, markerController);
-            markerController.SetMarker(marker);
-        }
-
-        private Vector3 GetFormationOffset(int index)
-        {
-            if (formationColumns <= 0)
-                formationColumns = 1;
-
-            int row = index / formationColumns;
-            int column = index % formationColumns;
-
-            float centeredColumn = column - (formationColumns - 1) / 2f;
-
-            return new Vector3(
-                centeredColumn * formationSpacing,
-                0f,
-                row * formationSpacing
-            );
+            SkyboundDebug.Log($"Box selected {unitsInBox.Count} unit(s).", this);
         }
 
         private void SelectUnit(SelectableUnit unit)
         {
             if (unit == null)
+            {
+                SkyboundDebug.Warning("Tried to select a null unit.", this);
                 return;
+            }
 
             if (!unit.CanBeSelectedByPlayer())
+            {
+                SkyboundDebug.Warning($"{unit.name} cannot be selected by player.", unit);
                 return;
+            }
 
             if (selectedUnits.Contains(unit))
                 return;
 
             selectedUnits.Add(unit);
             unit.Select();
-
-            Debug.Log("Selected: " + unit.name);
         }
 
         private void ClearSelection()
@@ -233,79 +274,23 @@ namespace Skybound.InputSystem
                     unit.Deselect();
             }
 
+            if (selectedUnits.Count > 0)
+                SkyboundDebug.Log($"Cleared selection of {selectedUnits.Count} unit(s).", this);
+
             selectedUnits.Clear();
         }
 
         private Rect GetScreenRect(Vector2 start, Vector2 end)
         {
-            Vector2 bottomLeft = Vector2.Min(start, end);
-            Vector2 topRight = Vector2.Max(start, end);
+            Vector2 lowerLeft = Vector2.Min(start, end);
+            Vector2 upperRight = Vector2.Max(start, end);
 
-            return Rect.MinMaxRect(bottomLeft.x, bottomLeft.y, topRight.x, topRight.y);
-        }
-
-        private void OnGUI()
-        {
-            if (!isDragging)
-                return;
-
-            float dragDistance = Vector2.Distance(dragStartPosition, Input.mousePosition);
-
-            if (dragDistance < dragThreshold)
-                return;
-
-            Rect rect = GetGUIRect(dragStartPosition, Input.mousePosition);
-
-            GUI.color = new Color(0.2f, 0.6f, 1f, 0.25f);
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
-
-            GUI.color = new Color(0.2f, 0.6f, 1f, 1f);
-            DrawRectBorder(rect, 2f);
-
-            GUI.color = Color.white;
-        }
-
-        private Rect GetGUIRect(Vector2 start, Vector2 end)
-        {
-            start.y = Screen.height - start.y;
-            end.y = Screen.height - end.y;
-
-            Vector2 topLeft = Vector2.Min(start, end);
-            Vector2 bottomRight = Vector2.Max(start, end);
-
-            return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
-        }
-
-        private void DrawRectBorder(Rect rect, float thickness)
-        {
-            GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, rect.width, thickness), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.xMin, rect.yMax - thickness, rect.width, thickness), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, thickness, rect.height), Texture2D.whiteTexture);
-            GUI.DrawTexture(new Rect(rect.xMax - thickness, rect.yMin, thickness, rect.height), Texture2D.whiteTexture);
-        }
-        
-        private void IssueAttackCommand(CharacterStats targetStats)
-        {
-            if (GameManager.Instance != null && GameManager.Instance.IsPaused)
-                return;
-
-            foreach (SelectableUnit unit in selectedUnits)
-            {
-                if (unit == null)
-                    continue;
-
-                UnitMoveMarkerController markerController =
-                    unit.GetComponent<UnitMoveMarkerController>();
-
-                if (markerController != null)
-                    markerController.ClearMarker();
-
-                CombatAttackController attackController =
-                    unit.GetComponent<CombatAttackController>();
-
-                if (attackController != null)
-                    attackController.SetAttackTarget(targetStats);
-            }
+            return Rect.MinMaxRect(
+                lowerLeft.x,
+                lowerLeft.y,
+                upperRight.x,
+                upperRight.y
+            );
         }
     }
 }

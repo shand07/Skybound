@@ -15,6 +15,6 @@ MonoBehaviour:
   itemName: Long Sword
   handedness: 3
   baseDamage: 6
-  accuracyBonus: 1
+  accuracyBonus: 0
   attacksPerRoundBonus: 0
   attackRange: 2

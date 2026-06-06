@@ -1,10 +1,14 @@
 using System.Collections.Generic;
+using Skybound.Core.Diagnostics;
+using Skybound.Core.Services;
 using UnityEngine;
 
 namespace Skybound.Systems.FogOfWar
 {
     public class FogOfWarManager : MonoBehaviour
     {
+        public static FogOfWarManager Instance { get; private set; }
+
         [Header("Grid Settings")]
         [SerializeField] private int gridWidth = 40;
         [SerializeField] private int gridHeight = 40;
@@ -16,7 +20,7 @@ namespace Skybound.Systems.FogOfWar
 
         [Header("Update")]
         [SerializeField] private float updateInterval = 0.15f;
-        
+
         [Header("Map Bounds")]
         [SerializeField] private Renderer mapRenderer;
         [SerializeField] private float boundsPadding = 4f;
@@ -25,16 +29,42 @@ namespace Skybound.Systems.FogOfWar
         private readonly List<VisionSource> visionSources = new();
 
         private float updateTimer;
-        
-        public static FogOfWarManager Instance { get; private set; }
+        private bool hasGeneratedGrid;
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                SkyboundDebug.Warning("Duplicate FogOfWarManager found. Destroying duplicate.", this);
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            SkyboundServiceRegistry.Register(this);
+
+            SkyboundDebug.Log("FogOfWarManager initialized.", this);
+        }
 
         private void Start()
         {
             GenerateFogGrid();
         }
 
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+                SkyboundServiceRegistry.Unregister<FogOfWarManager>();
+            }
+        }
+
         private void Update()
         {
+            if (!hasGeneratedGrid)
+                return;
+
             updateTimer += Time.deltaTime;
 
             if (updateTimer < updateInterval)
@@ -45,35 +75,40 @@ namespace Skybound.Systems.FogOfWar
             RefreshVisionSources();
             UpdateFog();
         }
-        
-        private void Awake()
-        {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
 
-            Instance = this;
-        }
-        
         public FogState GetFogStateAtWorldPosition(Vector3 worldPosition)
         {
             FogTile closestTile = GetClosestTile(worldPosition);
 
             if (closestTile == null)
+            {
+                SkyboundDebug.Warning($"No fog tile found near world position {worldPosition}. Returning Unexplored.", this);
                 return FogState.Unexplored;
+            }
 
             return closestTile.State;
+        }
+
+        public bool IsWorldPositionVisible(Vector3 worldPosition)
+        {
+            FogTile closestTile = GetClosestTile(worldPosition);
+            return closestTile != null && closestTile.State == FogState.Visible;
         }
 
         private void GenerateFogGrid()
         {
             fogTiles.Clear();
+            hasGeneratedGrid = false;
+
+            if (fogTilePrefab == null)
+            {
+                SkyboundDebug.MissingReference(this, nameof(fogTilePrefab), "Assign a FogTile prefab in the inspector.");
+                return;
+            }
 
             if (mapRenderer == null)
             {
-                Debug.LogWarning("FogOfWarManager has no mapRenderer assigned.");
+                SkyboundDebug.MissingReference(this, nameof(mapRenderer), "Assign the map renderer used to calculate fog bounds.");
                 return;
             }
 
@@ -118,6 +153,10 @@ namespace Skybound.Systems.FogOfWar
                     fogTiles.Add(tile);
                 }
             }
+
+            hasGeneratedGrid = true;
+
+            SkyboundDebug.Log($"Generated fog grid. Width: {gridWidth}, Height: {gridHeight}, Tiles: {fogTiles.Count}", this);
         }
 
         private void RefreshVisionSources()
@@ -147,9 +186,7 @@ namespace Skybound.Systems.FogOfWar
             }
 
             foreach (VisionSource source in visionSources)
-            {
                 RevealAroundSource(source);
-            }
         }
 
         private void RevealAroundSource(VisionSource source)
@@ -165,17 +202,8 @@ namespace Skybound.Systems.FogOfWar
                 );
 
                 if (distance <= visionRange + tileSize * 0.5f)
-                {
                     tile.SetState(FogState.Visible);
-                }
             }
-        }
-
-        public bool IsWorldPositionVisible(Vector3 worldPosition)
-        {
-            FogTile closestTile = GetClosestTile(worldPosition);
-
-            return closestTile != null && closestTile.State == FogState.Visible;
         }
 
         private FogTile GetClosestTile(Vector3 worldPosition)

@@ -1,4 +1,6 @@
 using Skybound.Characters;
+using Skybound.Core.Diagnostics;
+using Skybound.Core.Services;
 using UnityEngine;
 
 namespace Skybound.Combat
@@ -21,8 +23,9 @@ namespace Skybound.Combat
         [SerializeField] private float nextMainHandAttackTime;
 
         private CharacterEquipment equipment;
+        private CombatStateManager combatStateManager;
 
-        public float RoundProgress => roundTimer / roundDuration;
+        public float RoundProgress => roundDuration > 0f ? roundTimer / roundDuration : 0f;
         public int AvailableActions => availableActions;
         public int AttacksRemainingThisRound => attacksRemainingThisRound;
         public int MainHandAttacksRemainingThisRound => mainHandAttacksRemainingThisRound;
@@ -34,15 +37,54 @@ namespace Skybound.Combat
         private void Awake()
         {
             equipment = GetComponent<CharacterEquipment>();
+
+            if (roundDuration <= 0f)
+            {
+                SkyboundDebug.Warning($"{name} had invalid roundDuration. Resetting to 6.", this);
+                roundDuration = 6f;
+            }
+
+            if (actionsPerRound < 0)
+            {
+                SkyboundDebug.Warning($"{name} had negative actionsPerRound. Resetting to 0.", this);
+                actionsPerRound = 0;
+            }
+
+            if (attacksPerRound < 0f)
+            {
+                SkyboundDebug.Warning($"{name} had negative attacksPerRound. Resetting to 0.", this);
+                attacksPerRound = 0f;
+            }
+
             ResetCombatClock(0f);
+        }
+
+        private void Start()
+        {
+            ResolveDependencies();
         }
 
         private void Update()
         {
-            if (CombatStateManager.Instance == null || !CombatStateManager.Instance.IsInCombat)
+            if (combatStateManager == null)
+                return;
+
+            if (!combatStateManager.IsInCombat)
                 return;
 
             TickRound();
+        }
+
+        private void ResolveDependencies()
+        {
+            if (!SkyboundServiceRegistry.TryGet(out combatStateManager))
+            {
+                SkyboundDebug.ServiceUnavailable(
+                    this,
+                    nameof(CombatStateManager),
+                    "CombatClock will not tick until CombatStateManager is available."
+                );
+            }
         }
 
         public void ResetCombatClock(float startingProgress)
@@ -68,7 +110,10 @@ namespace Skybound.Combat
             ResetRoundAttacks();
             nextMainHandAttackTime = 0f;
 
-            Debug.Log($"{name} started new round. Actions: {availableActions}, Main Attacks: {mainHandAttacksRemainingThisRound}, Offhand Attacks: {offHandAttacksRemainingThisRound}");
+            SkyboundDebug.Log(
+                $"{name} started new round. Actions: {availableActions}, Main Attacks: {mainHandAttacksRemainingThisRound}, Offhand Attacks: {offHandAttacksRemainingThisRound}",
+                this
+            );
         }
 
         private void ResetRoundAttacks()
@@ -90,7 +135,8 @@ namespace Skybound.Combat
                 return false;
 
             availableActions--;
-            Debug.Log($"{name} spent action. Actions left: {availableActions}");
+
+            SkyboundDebug.Log($"{name} spent action. Actions left: {availableActions}", this);
             return true;
         }
 
@@ -113,7 +159,7 @@ namespace Skybound.Combat
 
             nextMainHandAttackTime += attackInterval;
 
-            Debug.Log($"{name} spent main-hand attack. Main attacks left: {mainHandAttacksRemainingThisRound}");
+            SkyboundDebug.Log($"{name} spent main-hand attack. Main attacks left: {mainHandAttacksRemainingThisRound}", this);
 
             return true;
         }
@@ -126,7 +172,7 @@ namespace Skybound.Combat
             offHandAttacksRemainingThisRound--;
             attacksRemainingThisRound--;
 
-            Debug.Log($"{name} spent off-hand attack. Offhand attacks left: {offHandAttacksRemainingThisRound}");
+            SkyboundDebug.Log($"{name} spent off-hand attack. Offhand attacks left: {offHandAttacksRemainingThisRound}", this);
 
             return true;
         }

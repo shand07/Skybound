@@ -1,3 +1,4 @@
+using Skybound.Core.Diagnostics;
 using UnityEngine;
 
 namespace Skybound.Items
@@ -14,5 +15,28 @@ namespace Skybound.Items
         public HandednessType Handedness => handedness;
 
         public bool IsTwoHanded => handedness == HandednessType.TwoHanded;
+
+        protected virtual void OnValidate()
+        {
+            ValidateInEditor();
+        }
+
+        public virtual bool IsValid(out string errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(itemName))
+            {
+                errorMessage = "Item name is empty.";
+                return false;
+            }
+
+            errorMessage = string.Empty;
+            return true;
+        }
+
+        protected void ValidateInEditor()
+        {
+            if (!IsValid(out string errorMessage))
+                SkyboundDebug.Warning($"{name} EquippableItemData invalid: {errorMessage}", this);
+        }
     }
 }

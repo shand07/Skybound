@@ -1,3 +1,4 @@
+using Skybound.Core.Diagnostics;
 using UnityEngine;
 
 namespace Skybound.Items
@@ -17,5 +18,40 @@ namespace Skybound.Items
         public int AccuracyBonus => accuracyBonus;
         public float AttacksPerRoundBonus => attacksPerRoundBonus;
         public float AttackRange => attackRange;
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+
+            if (!IsValid(out string errorMessage))
+                SkyboundDebug.Warning($"{name} WeaponData invalid: {errorMessage}", this);
+        }
+
+        public override bool IsValid(out string errorMessage)
+        {
+            if (!base.IsValid(out errorMessage))
+                return false;
+
+            if (baseDamage < 0)
+            {
+                errorMessage = "Base damage cannot be negative.";
+                return false;
+            }
+
+            if (attacksPerRoundBonus < 0f)
+            {
+                errorMessage = "Attacks per round bonus cannot be negative.";
+                return false;
+            }
+
+            if (attackRange <= 0f)
+            {
+                errorMessage = "Attack range must be greater than 0.";
+                return false;
+            }
+
+            errorMessage = string.Empty;
+            return true;
+        }
     }
 }

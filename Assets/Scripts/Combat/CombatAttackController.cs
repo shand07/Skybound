@@ -1,5 +1,7 @@
 using Skybound.Characters;
 using Skybound.Core;
+using Skybound.Core.Diagnostics;
+using Skybound.Core.Services;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -30,6 +32,8 @@ namespace Skybound.Combat
         private CharacterStats attackerStats;
         private CombatClock combatClock;
         private CharacterEquipment equipment;
+        private GameManager gameManager;
+        private CombatStateManager combatStateManager;
 
         private CharacterStats currentTarget;
         private float attackCheckTimer;
@@ -44,12 +48,19 @@ namespace Skybound.Combat
             combatClock = GetComponent<CombatClock>();
             equipment = GetComponent<CharacterEquipment>();
 
+            ValidateReferences();
+            ValidateSettings();
             UpdateStoppingDistance();
+        }
+
+        private void Start()
+        {
+            ResolveDependencies();
         }
 
         private void Update()
         {
-            if (GameManager.Instance != null && GameManager.Instance.IsPaused)
+            if (gameManager != null && gameManager.IsPaused)
                 return;
 
             if (currentTarget == null || currentTarget.IsDead)
@@ -66,10 +77,85 @@ namespace Skybound.Combat
             HandleAttackTarget();
         }
 
+        private void ResolveDependencies()
+        {
+            if (!SkyboundServiceRegistry.TryGet(out gameManager))
+            {
+                SkyboundDebug.ServiceUnavailable(
+                    this,
+                    nameof(GameManager),
+                    "CombatAttackController will ignore pause state until GameManager is available."
+                );
+            }
+
+            if (!SkyboundServiceRegistry.TryGet(out combatStateManager))
+            {
+                SkyboundDebug.ServiceUnavailable(
+                    this,
+                    nameof(CombatStateManager),
+                    "CombatAttackController cannot register combat targets without CombatStateManager."
+                );
+            }
+        }
+
+        private void ValidateReferences()
+        {
+            if (agent == null)
+                SkyboundDebug.MissingReference(this, nameof(NavMeshAgent));
+
+            if (attackerStats == null)
+                SkyboundDebug.MissingReference(this, nameof(CharacterStats));
+
+            if (combatClock == null)
+                SkyboundDebug.MissingReference(this, nameof(CombatClock));
+        }
+
+        private void ValidateSettings()
+        {
+            if (baseWeaponDamage < 0)
+            {
+                SkyboundDebug.Warning($"{name} had negative baseWeaponDamage. Resetting to 0.", this);
+                baseWeaponDamage = 0;
+            }
+
+            if (attackRange <= 0f)
+            {
+                SkyboundDebug.Warning($"{name} had invalid attackRange. Resetting to 2.", this);
+                attackRange = 2f;
+            }
+
+            if (attackCheckInterval <= 0f)
+            {
+                SkyboundDebug.Warning($"{name} had invalid attackCheckInterval. Resetting to 0.15.", this);
+                attackCheckInterval = 0.15f;
+            }
+
+            if (criticalDamageMultiplier < 1f)
+            {
+                SkyboundDebug.Warning($"{name} had invalid criticalDamageMultiplier. Resetting to 2.", this);
+                criticalDamageMultiplier = 2f;
+            }
+
+            if (offHandFollowUpDelay < 0f)
+            {
+                SkyboundDebug.Warning($"{name} had negative offHandFollowUpDelay. Resetting to 0.", this);
+                offHandFollowUpDelay = 0f;
+            }
+        }
+
         public void SetAttackTarget(CharacterStats target)
         {
-            if (target == null || target == attackerStats)
+            if (target == null)
+            {
+                SkyboundDebug.Warning($"{name} tried to attack a null target.", this);
                 return;
+            }
+
+            if (target == attackerStats)
+            {
+                SkyboundDebug.Warning($"{name} tried to attack itself.", this);
+                return;
+            }
 
             currentTarget = target;
 
@@ -78,13 +164,17 @@ namespace Skybound.Combat
             if (agent != null)
                 agent.isStopped = false;
 
-            CombatStateManager.Instance?.RegisterEnemy(target.gameObject);
+            if (combatStateManager != null)
+                combatStateManager.RegisterEnemy(target.gameObject);
 
-            Debug.Log($"{name} attacking {target.name}");
+            SkyboundDebug.Log($"{name} attacking {target.name}.", this);
         }
 
         public void ClearTarget()
         {
+            if (currentTarget != null)
+                SkyboundDebug.Log($"{name} cleared attack target {currentTarget.name}.", this);
+
             currentTarget = null;
             hasPendingOffHandAttack = false;
             pendingOffHandTimer = 0f;
@@ -95,6 +185,9 @@ namespace Skybound.Combat
 
         private void HandleAttackTarget()
         {
+            if (currentTarget == null || currentTarget.IsDead)
+                return;
+
             float currentAttackRange = GetAttackRange();
 
             float distance = Vector3.Distance(
@@ -104,14 +197,18 @@ namespace Skybound.Combat
 
             if (distance > currentAttackRange)
             {
+                if (agent == null)
+                    return;
+
                 agent.isStopped = false;
                 agent.SetDestination(currentTarget.transform.position);
                 return;
             }
 
-            agent.isStopped = true;
+            if (agent != null)
+                agent.isStopped = true;
 
-            if (!combatClock.TrySpendMainHandAttack())
+            if (combatClock == null || !combatClock.TrySpendMainHandAttack())
                 return;
 
             PerformAttack(AttackHand.MainHand);
@@ -146,7 +243,7 @@ namespace Skybound.Combat
             if (distance > GetAttackRange())
                 return;
 
-            if (!combatClock.TrySpendOffHandAttack())
+            if (combatClock == null || !combatClock.TrySpendOffHandAttack())
                 return;
 
             PerformAttack(AttackHand.OffHand);
@@ -154,6 +251,9 @@ namespace Skybound.Combat
 
         private void PerformAttack(AttackHand attackHand)
         {
+            if (attackerStats == null || currentTarget == null)
+                return;
+
             int accuracyBonus = GetAccuracyBonus(attackHand);
 
             bool hit = attackerStats.RollAttackAgainst(
@@ -166,7 +266,7 @@ namespace Skybound.Combat
 
             if (!hit)
             {
-                Debug.Log($"{name} rolled {roll} and missed {currentTarget.name} with {attackHand}.");
+                SkyboundDebug.Log($"{name} rolled {roll} and missed {currentTarget.name} with {attackHand}.", this);
                 return;
             }
 
@@ -175,7 +275,7 @@ namespace Skybound.Combat
             if (isCritical)
                 damage = Mathf.RoundToInt(damage * criticalDamageMultiplier);
 
-            Debug.Log($"{name} rolled {roll} and hit {currentTarget.name} with {attackHand} for {damage} damage.");
+            SkyboundDebug.Log($"{name} rolled {roll} and hit {currentTarget.name} with {attackHand} for {damage} damage.", this);
 
             currentTarget.TakeDamage(damage);
 

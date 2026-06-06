@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe72cb16c5c8d94fb8e45fd32ffe7b5, type: 3}
   m_Name: Party1
   m_EditorClassIdentifier: Assembly-CSharp::Skybound.Data.CharacterData
-  characterName: 
+  characterName: Party 1
   strength: 13
   dexterity: 16
   constitution: 12

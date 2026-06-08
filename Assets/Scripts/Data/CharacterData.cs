@@ -1,10 +1,9 @@
-using Skybound.Core.Diagnostics;
 using UnityEngine;
 
 namespace Skybound.Data
 {
     [CreateAssetMenu(fileName = "NewCharacterData", menuName = "Skybound/Characters/Character Data")]
-    public class CharacterData : ScriptableObject
+    public class CharacterData : SkyboundDataAsset
     {
         [Header("Identity")]
         [SerializeField] private string characterName;
@@ -38,75 +37,37 @@ namespace Skybound.Data
         public int BaseArmorClass => baseArmorClass;
         public int BaseDamageReduction => baseDamageReduction;
 
-        private void OnValidate()
+        protected override bool ValidateData(out string errorMessage)
         {
-            ValidateInEditor();
-        }
-
-        public bool IsValid(out string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(characterName))
-            {
-                errorMessage = "Character name is empty.";
+            if (!ValidateRequiredString(characterName, nameof(characterName), out errorMessage))
                 return false;
-            }
 
-            if (strength < 1)
-            {
-                errorMessage = "Strength must be at least 1.";
+            if (!ValidateMinimumInt(strength, 1, nameof(strength), out errorMessage))
                 return false;
-            }
 
-            if (dexterity < 1)
-            {
-                errorMessage = "Dexterity must be at least 1.";
+            if (!ValidateMinimumInt(dexterity, 1, nameof(dexterity), out errorMessage))
                 return false;
-            }
 
-            if (constitution < 1)
-            {
-                errorMessage = "Constitution must be at least 1.";
+            if (!ValidateMinimumInt(constitution, 1, nameof(constitution), out errorMessage))
                 return false;
-            }
 
-            if (intelligence < 1)
-            {
-                errorMessage = "Intelligence must be at least 1.";
+            if (!ValidateMinimumInt(intelligence, 1, nameof(intelligence), out errorMessage))
                 return false;
-            }
 
-            if (baseHealth <= 0)
-            {
-                errorMessage = "Base health must be greater than 0.";
+            if (!ValidateGreaterThanZero(baseHealth, nameof(baseHealth), out errorMessage))
                 return false;
-            }
 
-            if (healthPerConstitution < 0)
-            {
-                errorMessage = "Health per constitution cannot be negative.";
+            if (!ValidateMinimumInt(healthPerConstitution, 0, nameof(healthPerConstitution), out errorMessage))
                 return false;
-            }
 
-            if (baseArmorClass < 0)
-            {
-                errorMessage = "Base armor class cannot be negative.";
+            if (!ValidateMinimumInt(baseArmorClass, 0, nameof(baseArmorClass), out errorMessage))
                 return false;
-            }
 
-            if (baseDamageReduction < 0)
-            {
-                errorMessage = "Base damage reduction cannot be negative.";
+            if (!ValidateMinimumInt(baseDamageReduction, 0, nameof(baseDamageReduction), out errorMessage))
                 return false;
-            }
 
             errorMessage = string.Empty;
             return true;
-        }
-
-        private void ValidateInEditor()
-        {
-            if (!IsValid(out string errorMessage))
-                SkyboundDebug.Warning($"{name} CharacterData invalid: {errorMessage}", this);
         }
     }
 }

@@ -11,6 +11,13 @@ namespace Skybound.CameraSystem
 
         private void Update()
         {
+            
+            if (Skybound.Dialogue.DialogueRunner.Instance != null &&
+                Skybound.Dialogue.DialogueRunner.Instance.IsRunning)
+            {
+                return;
+            }
+            
             HandleMovement();
             HandleZoom();
         }

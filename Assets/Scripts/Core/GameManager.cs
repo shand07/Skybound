@@ -9,12 +9,13 @@ namespace Skybound.Core
         public static GameManager Instance { get; private set; }
 
         public bool IsPaused { get; private set; }
+        public bool IsPauseLocked { get; private set; }
 
         private void Awake()
         {
             if (Instance != null && Instance != this)
             {
-                SkyboundDebug.Warning("Duplicate GameManager found. Destroying duplicate.", this);
+                SkyboundDebug.Warning("Duplicate GameManager detected. Destroying duplicate.", this);
                 Destroy(gameObject);
                 return;
             }
@@ -22,8 +23,7 @@ namespace Skybound.Core
             Instance = this;
             SkyboundServiceRegistry.Register(this);
 
-            Time.timeScale = 1f;
-            IsPaused = false;
+            ForceResume();
 
             SkyboundDebug.Log("GameManager initialized.", this);
         }
@@ -45,10 +45,40 @@ namespace Skybound.Core
 
         public void TogglePause()
         {
-            IsPaused = !IsPaused;
+            if (IsPauseLocked)
+            {
+                SkyboundDebug.Log("Pause toggle blocked because pause is currently locked.", this);
+                return;
+            }
+
+            SetPaused(!IsPaused);
+        }
+
+        public void SetPauseLocked(bool locked)
+        {
+            IsPauseLocked = locked;
+
+            if (locked)
+                SetPaused(true);
+            else
+                SetPaused(false);
+
+            SkyboundDebug.Log(locked ? "Game pause locked." : "Game pause unlocked.", this);
+        }
+
+        private void SetPaused(bool paused)
+        {
+            IsPaused = paused;
             Time.timeScale = IsPaused ? 0f : 1f;
 
-            SkyboundDebug.Log(IsPaused ? "Game paused." : "Game unpaused.", this);
+            SkyboundDebug.Log($"Pause state changed. IsPaused = {IsPaused}", this);
+        }
+
+        private void ForceResume()
+        {
+            IsPauseLocked = false;
+            IsPaused = false;
+            Time.timeScale = 1f;
         }
     }
 }

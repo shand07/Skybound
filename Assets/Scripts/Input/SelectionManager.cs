@@ -3,6 +3,7 @@ using Skybound.Characters;
 using Skybound.Core.Diagnostics;
 using Skybound.UI;
 using UnityEngine;
+using Skybound.Dialogue;
 
 namespace Skybound.InputSystem
 {
@@ -105,6 +106,10 @@ namespace Skybound.InputSystem
 
         private void HandleInput()
         {
+            
+            if (DialogueRunner.Instance != null && DialogueRunner.Instance.IsRunning)
+            return;
+            
             if (mainCamera == null)
                 return;
 

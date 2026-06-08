@@ -1,9 +1,9 @@
-using Skybound.Core.Diagnostics;
+using Skybound.Data;
 using UnityEngine;
 
 namespace Skybound.Items
 {
-    public abstract class EquippableItemData : ScriptableObject
+    public abstract class EquippableItemData : SkyboundDataAsset
     {
         [Header("Item Identity")]
         [SerializeField] private string itemName;
@@ -16,27 +16,13 @@ namespace Skybound.Items
 
         public bool IsTwoHanded => handedness == HandednessType.TwoHanded;
 
-        protected virtual void OnValidate()
+        protected override bool ValidateData(out string errorMessage)
         {
-            ValidateInEditor();
-        }
-
-        public virtual bool IsValid(out string errorMessage)
-        {
-            if (string.IsNullOrWhiteSpace(itemName))
-            {
-                errorMessage = "Item name is empty.";
+            if (!ValidateRequiredString(itemName, nameof(itemName), out errorMessage))
                 return false;
-            }
 
             errorMessage = string.Empty;
             return true;
-        }
-
-        protected void ValidateInEditor()
-        {
-            if (!IsValid(out string errorMessage))
-                SkyboundDebug.Warning($"{name} EquippableItemData invalid: {errorMessage}", this);
         }
     }
 }

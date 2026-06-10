@@ -29,11 +29,77 @@ MonoBehaviour:
     visualNovelImage: {fileID: 0}
     choices: []
   - nodeId: second
+    nextNodeId: third
+    endsDialogue: 0
+    presentationMode: 0
+    speakerName: Yumina
+    speakerPortrait: {fileID: 21300000, guid: 0e7163bba063862469e313879e4c5952, type: 3}
+    text: 'And this is the second . '
+    visualNovelImage: {fileID: 0}
+    choices: []
+  - nodeId: third
+    nextNodeId: fourth
+    endsDialogue: 0
+    presentationMode: 1
+    speakerName: Yumina
+    speakerPortrait: {fileID: 21300000, guid: 0e7163bba063862469e313879e4c5952, type: 3}
+    text: This is a test for the visual novel scene. This is a test for the visual
+      novel scene.This is a test for the visual novel scene.This is a test for the
+      visual novel scene.This is a test for the visual novel scene.This is a test
+      for the visual novel scene.This is a test for the visual novel scene.This is
+      a test for the visual novel scene.This is a test for the visual novel scene.This
+      is a test for the visual novel scene.This is a test for the visual novel scene.This
+      is a test for the visual novel scene.This is a test for the visual novel scene.This
+      is a test for the visual novel scene.This is a test for the visual novel scene.This
+      is a test for the visual novel scene.This is a test for the visual novel scene.This
+      is a test for the visual novel scene.This is a test for the visual novel scene.
+    visualNovelImage: {fileID: 21300000, guid: db1e9e32a70194d49ad9c3fba7d2c350, type: 3}
+    choices: []
+  - nodeId: fourth
+    nextNodeId: fifth
+    endsDialogue: 0
+    presentationMode: 1
+    speakerName: Arkael
+    speakerPortrait: {fileID: 21300000, guid: 566ff82b2dc02ef49b811e4efdffbcdb, type: 3}
+    text: How do you respond?
+    visualNovelImage: {fileID: 21300000, guid: db1e9e32a70194d49ad9c3fba7d2c350, type: 3}
+    choices:
+    - choiceText: Test Response 1
+      nextNodeId: fifth
+    - choiceText: Test Response 2
+      nextNodeId: fifth
+    - choiceText: Test Response 3
+      nextNodeId: fifth
+  - nodeId: fifth
+    nextNodeId: sixth
+    endsDialogue: 0
+    presentationMode: 0
+    speakerName: Yumina
+    speakerPortrait: {fileID: 21300000, guid: 0e7163bba063862469e313879e4c5952, type: 3}
+    text: Back to normal dialogue.
+    visualNovelImage: {fileID: 21300000, guid: db1e9e32a70194d49ad9c3fba7d2c350, type: 3}
+    choices: []
+  - nodeId: sixth
+    nextNodeId: seven
+    endsDialogue: 0
+    presentationMode: 0
+    speakerName: Arkael
+    speakerPortrait: {fileID: 21300000, guid: 566ff82b2dc02ef49b811e4efdffbcdb, type: 3}
+    text: How do you respond?
+    visualNovelImage: {fileID: 21300000, guid: db1e9e32a70194d49ad9c3fba7d2c350, type: 3}
+    choices:
+    - choiceText: 1. This is a test response.
+      nextNodeId: final
+    - choiceText: 2. This is a test response.
+      nextNodeId: final
+    - choiceText: 3. This is a test response.
+      nextNodeId: final
+  - nodeId: final
     nextNodeId: 
     endsDialogue: 1
     presentationMode: 0
     speakerName: Yumina
     speakerPortrait: {fileID: 21300000, guid: 0e7163bba063862469e313879e4c5952, type: 3}
-    text: And this is the second Dialogue.
-    visualNovelImage: {fileID: 0}
+    text: This is the end.
+    visualNovelImage: {fileID: 21300000, guid: db1e9e32a70194d49ad9c3fba7d2c350, type: 3}
     choices: []

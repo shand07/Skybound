@@ -21,13 +21,15 @@ namespace Skybound.Dialogue
         [Header("Dialogue")]
         [SerializeField] private TMP_Text dialogueText;
 
-        [Header("Buttons")]
-        [SerializeField] private Button continueButton;
-        [SerializeField] private Button endDialogueButton;
+        [Header("Action Button")]
+        [SerializeField] private Button actionButton;
+        [SerializeField] private TMP_Text actionButtonText;
 
         [Header("Choices")]
         [SerializeField] private Transform choiceContainer;
         [SerializeField] private DialogueChoiceButton choiceButtonPrefab;
+
+        private bool currentNodeEndsDialogue;
 
         private void Awake()
         {
@@ -37,20 +39,14 @@ namespace Skybound.Dialogue
 
         private void OnEnable()
         {
-            if (continueButton != null)
-                continueButton.onClick.AddListener(HandleContinueClicked);
-
-            if (endDialogueButton != null)
-                endDialogueButton.onClick.AddListener(HandleEndDialogueClicked);
+            if (actionButton != null)
+                actionButton.onClick.AddListener(HandleActionButtonClicked);
         }
 
         private void OnDisable()
         {
-            if (continueButton != null)
-                continueButton.onClick.RemoveListener(HandleContinueClicked);
-
-            if (endDialogueButton != null)
-                endDialogueButton.onClick.RemoveListener(HandleEndDialogueClicked);
+            if (actionButton != null)
+                actionButton.onClick.RemoveListener(HandleActionButtonClicked);
         }
 
         public void Show(DialogueNodeData node)
@@ -61,6 +57,8 @@ namespace Skybound.Dialogue
                 Hide();
                 return;
             }
+
+            currentNodeEndsDialogue = node.EndsDialogue;
 
             if (root != null)
                 root.SetActive(true);
@@ -87,11 +85,11 @@ namespace Skybound.Dialogue
 
             bool hasChoices = node.HasChoices;
 
-            if (continueButton != null)
-                continueButton.gameObject.SetActive(!hasChoices && !node.EndsDialogue);
+            if (actionButton != null)
+                actionButton.gameObject.SetActive(!hasChoices);
 
-            if (endDialogueButton != null)
-                endDialogueButton.gameObject.SetActive(node.EndsDialogue);
+            if (actionButtonText != null)
+                actionButtonText.text = node.EndsDialogue ? "End Dialogue" : "Continue";
         }
 
         public void Hide()
@@ -122,7 +120,11 @@ namespace Skybound.Dialogue
 
             if (choiceButtonPrefab == null)
             {
-                SkyboundDebug.MissingReference(this, nameof(choiceButtonPrefab));
+                SkyboundDebug.Warning(
+                    "Choice node found, but no choiceButtonPrefab is assigned. Choices cannot be displayed.",
+                    this
+                );
+
                 return;
             }
 
@@ -160,14 +162,15 @@ namespace Skybound.Dialogue
             choiceContainer.gameObject.SetActive(false);
         }
 
-        private void HandleContinueClicked()
+        private void HandleActionButtonClicked()
         {
-            DialogueRunner.Instance?.Continue();
-        }
+            if (currentNodeEndsDialogue)
+            {
+                DialogueRunner.Instance?.EndDialogue();
+                return;
+            }
 
-        private void HandleEndDialogueClicked()
-        {
-            DialogueRunner.Instance?.EndDialogue();
+            DialogueRunner.Instance?.Continue();
         }
 
         private void ValidateReferences()
@@ -184,17 +187,22 @@ namespace Skybound.Dialogue
             if (dialogueText == null)
                 SkyboundDebug.MissingReference(this, nameof(dialogueText));
 
-            if (continueButton == null)
-                SkyboundDebug.MissingReference(this, nameof(continueButton));
+            if (actionButton == null)
+                SkyboundDebug.MissingReference(this, nameof(actionButton));
 
-            if (endDialogueButton == null)
-                SkyboundDebug.MissingReference(this, nameof(endDialogueButton));
+            if (actionButtonText == null)
+                SkyboundDebug.MissingReference(this, nameof(actionButtonText));
 
             if (choiceContainer == null)
                 SkyboundDebug.MissingReference(this, nameof(choiceContainer));
 
             if (choiceButtonPrefab == null)
-                SkyboundDebug.MissingReference(this, nameof(choiceButtonPrefab));
+            {
+                SkyboundDebug.Warning(
+                    "No choiceButtonPrefab assigned. Choice dialogue will be unavailable until one is assigned.",
+                    this
+                );
+            }
         }
     }
 }

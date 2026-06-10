@@ -1,0 +1,79 @@
+{
+  "characters": [
+    {
+      "id": "arkael",
+      "displayName": "Arkael Dawnstrider",
+      "portraitId": "portrait_arkael_default",
+      "dialogueProfileId": "arkael_default",
+      "attributes": {
+        "strength": 14,
+        "dexterity": 16,
+        "constitution": 13,
+        "intelligence": 12
+      },
+      "health": {
+        "baseHealth": 50,
+        "healthPerConstitution": 5
+      },
+      "combat": {
+        "baseAccuracy": 0,
+        "baseArmorClass": 10,
+        "baseDamageReduction": 0
+      },
+      "startingEquipment": {
+        "mainHandItemId": "",
+        "offHandItemId": ""
+      }
+    },
+    {
+      "id": "yumina",
+      "displayName": "Yumina",
+      "portraitId": "portrait_yumina_default",
+      "dialogueProfileId": "yumina_default",
+      "attributes": {
+        "strength": 10,
+        "dexterity": 14,
+        "constitution": 12,
+        "intelligence": 15
+      },
+      "health": {
+        "baseHealth": 50,
+        "healthPerConstitution": 5
+      },
+      "combat": {
+        "baseAccuracy": 0,
+        "baseArmorClass": 10,
+        "baseDamageReduction": 0
+      },
+      "startingEquipment": {
+        "mainHandItemId": "",
+        "offHandItemId": ""
+      }
+    },
+    {
+      "id": "bandit_test",
+      "displayName": "Bandit",
+      "portraitId": "",
+      "dialogueProfileId": "",
+      "attributes": {
+        "strength": 12,
+        "dexterity": 11,
+        "constitution": 10,
+        "intelligence": 8
+      },
+      "health": {
+        "baseHealth": 40,
+        "healthPerConstitution": 4
+      },
+      "combat": {
+        "baseAccuracy": 0,
+        "baseArmorClass": 10,
+        "baseDamageReduction": 0
+      },
+      "startingEquipment": {
+        "mainHandItemId": "",
+        "offHandItemId": ""
+      }
+    }
+  ]
+}
